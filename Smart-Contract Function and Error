@@ -1,0 +1,23 @@
+pragma solidity ^0.5.0;
+
+contract ErrorHandling {
+    function checkRequire(uint value) public pure {
+        require(value <= 5, "Value is greater than 5");
+    }
+
+    function checkRevert(uint value) public pure {
+        if (value > 1) {
+            if (value > 2) {
+                if (value > 10) {
+                    revert("Value is greater than 10");
+                }
+            }
+        }
+    }
+
+    uint public storedNumber = 100;
+
+    function verifyAssert() public view {
+        assert(storedNumber == 100);
+    }
+}
