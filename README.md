@@ -1,6 +1,5 @@
 # Description
 
-Error Handling
 The ErrorHandling contract demonstrates how to use require, revert, and assert statements in Solidity for error handling.
 
 ### Executing Program
