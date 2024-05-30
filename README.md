@@ -1,34 +1,40 @@
 # Description
 
- This contract demonstrates how to use require, revert, and assert statements in Solidity for Example Item and Prices.
+This contract demonstrates how to use require, revert, and assert statements in Solidity.
 
 ### Executing Program
 To run this program, you can use Remix, an online Solidity IDE. To get started, go to the Remix website at https://remix.ethereum.org/.
 
 pragma solidity ^0.8.0;
 
-contract PriceHandler {
-    mapping(string => uint256) public prices;
+contract EmailContract {
+    mapping(address => string) public userEmails; 
 
-    event PriceSet(string itemName, uint256 price);
+    event EmailAdded(address indexed account, string email);
+    event EmailUpdated(address indexed account, string newEmail);
 
-    function setPrice(string memory _itemName, uint256 _price) external {
-        require(_price > 0, "Price must be greater than zero");
-
-        assert(_price <= 10000 ether); 
-
-        if (bytes(_itemName).length == 0) {
-            revert("Item name must not be empty");
-        }
-
-        prices[_itemName] = _price;
-        emit PriceSet(_itemName, _price);
+    function addEmail(string memory email) public {
+        assert(bytes(email).length > 0);
+        userEmails[msg.sender] = email; 
+        emit EmailAdded(msg.sender, email);
     }
 
-    function getPrice(string memory _itemName) external view returns (uint256) {
-        return prices[_itemName];
+    function updateEmail(string memory newEmail) public {
+        assert(bytes(newEmail).length > 0);
+        userEmails[msg.sender] = newEmail; 
+        emit EmailUpdated(msg.sender, newEmail);
+    }
+
+    function removeEmail() public {
+        require(bytes(userEmails[msg.sender]).length > 0, "No email address to remove");
+         
+         if(bytes(userEmails[msg.sender]).length == 0) {
+        revert("No email address to remove");
+        }
+        delete userEmails[msg.sender];
     }
 }
+
 
 
 # Author
