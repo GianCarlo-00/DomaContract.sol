@@ -7,34 +7,45 @@ To run this program, you can use Remix, an online Solidity IDE. To get started, 
 
 pragma solidity ^0.8.0;
 
-contract EmailContract {
-    mapping(address => string) public userEmails; 
+contract NikeShoes {
+    mapping(address => uint256) public products;
 
-    event EmailAdded(address indexed account, string email);
-    event EmailUpdated(address indexed account, string newEmail);
+    event ProductAdded(address indexed owner, string productName, uint256 quantity);
+    event ProductPurchased(address indexed buyer, string productName, uint256 quantity);
 
-    function addEmail(string memory email) public {
-        assert(bytes(email).length > 0);
-        userEmails[msg.sender] = email; 
-        emit EmailAdded(msg.sender, email);
+    function addProduct(string memory _productName, uint256 _quantity) external {
+        require(bytes(_productName).length > 0, "Product name cannot be empty");
+        require(_quantity > 0, "Quantity must be greater than 0");
+
+        products[msg.sender] += _quantity;
+        emit ProductAdded(msg.sender, _productName, _quantity);
     }
 
-    function updateEmail(string memory newEmail) public {
-        assert(bytes(newEmail).length > 0);
-        userEmails[msg.sender] = newEmail; 
-        emit EmailUpdated(msg.sender, newEmail);
+    function purchaseProduct(address _seller, string memory _productName, uint256 _quantity) external payable {
+        require(bytes(_productName).length > 0, "Product name cannot be empty");
+        require(_quantity > 0, "Quantity must be greater than 0");
+        require(products[_seller] >= _quantity, "Insufficient quantity available");
+
+        uint256 totalPrice = _quantity * 1 ether; 
+        require(msg.value >= totalPrice, "Insufficient payment");
+
+        uint256 previousQuantity = products[_seller];
+        assert(previousQuantity - _quantity < previousQuantity);
+
+        products[_seller] -= _quantity;
+        emit ProductPurchased(msg.sender, _productName, _quantity);
+
+        payable(_seller).transfer(totalPrice);
     }
 
-    function removeEmail() public {
-        require(bytes(userEmails[msg.sender]).length > 0, "No email address to remove");
-         
-         if(bytes(userEmails[msg.sender]).length == 0) {
-        revert("No email address to remove");
-        }
-        delete userEmails[msg.sender];
+    function getAvailableQuantity(address _seller) external view returns (uint256) {
+        return products[_seller];
+    }
+
+    function triggerRevert() pure external {
+        revert("Transaction reverted intentionally");
     }
 }
-
 
 
 # Author
